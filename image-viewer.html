@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>画像ビューア</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .upload-area {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+
+        .custom-file-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .custom-file-button:active {
+            transform: translateY(0);
+        }
+
+        .image-display {
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .placeholder {
+            color: #999;
+            font-size: 18px;
+            padding: 60px 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            width: 100%;
+        }
+
+        .image-container {
+            display: none;
+        }
+
+        .image-container.show {
+            display: block;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .image-info p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .image-info strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📷 画像ビューア</h1>
+
+        <div class="upload-area">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept="image/*">
+                <label for="fileInput" class="custom-file-button">
+                    画像を選択
+                </label>
+            </div>
+        </div>
+
+        <div class="image-display">
+            <div class="placeholder" id="placeholder">
+                画像を選択すると、ここに表示されます
+            </div>
+            <div class="image-container" id="imageContainer">
+                <img id="displayImage" src="" alt="選択された画像">
+                <div class="image-info" id="imageInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const placeholder = document.getElementById('placeholder');
+        const imageContainer = document.getElementById('imageContainer');
+        const displayImage = document.getElementById('displayImage');
+        const imageInfo = document.getElementById('imageInfo');
+
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    displayImage.src = e.target.result;
+                    placeholder.style.display = 'none';
+                    imageContainer.classList.add('show');
+
+                    const img = new Image();
+                    img.onload = function() {
+                        const fileSizeKB = (file.size / 1024).toFixed(2);
+                        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                        const sizeDisplay = file.size > 1024 * 1024 ? `${fileSizeMB} MB` : `${fileSizeKB} KB`;
+
+                        imageInfo.innerHTML = `
+                            <p><strong>ファイル名:</strong> ${file.name}</p>
+                            <p><strong>ファイルサイズ:</strong> ${sizeDisplay}</p>
+                            <p><strong>画像サイズ:</strong> ${this.width} × ${this.height} ピクセル</p>
+                            <p><strong>ファイル形式:</strong> ${file.type}</p>
+                        `;
+                    };
+                    img.src = e.target.result;
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                alert('画像ファイルを選択してください。');
+            }
+        });
+    </script>
+</body>
+</html>
